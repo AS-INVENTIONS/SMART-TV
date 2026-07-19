@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connecting to Smart TV...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #0f172a; color: #3b82f6; font-family: sans-serif; text-align: center; margin-top: 40vh; }
+        .loader { border: 4px solid #1e293b; border-top: 4px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        h3 { color: #f8fafc; font-weight: normal; }
+    </style>
+</head>
+<body>
+    <div class="loader"></div>
+    <h3 id="msg">Finding your TV Remote...</h3>
+    <script>
+        fetch('https://ntfy.sh/aman-tv-remote-99/json?poll=1')
+            .then(response => response.text())
+            .then(text => {
+                let lines = text.trim().split('\n');
+                let lastLine = JSON.parse(lines[lines.length - 1]);
+                let ip = lastLine.message;
+                
+                if(ip && ip.includes(".")) {
+                    document.getElementById('msg').innerText = "Found! Redirecting...";
+                    window.location.replace("http://" + ip + ":5000");
+                } else {
+                    throw new Error("No IP found");
+                }
+            })
+            .catch(err => {
+                document.getElementById('msg').innerHTML = "<span style='color:#ef4444;'>TV Server is Offline! Please start the Python code on Android.</span>";
+                document.querySelector('.loader').style.display = "none";
+            });
+    </script>
+</body>
+</html>
